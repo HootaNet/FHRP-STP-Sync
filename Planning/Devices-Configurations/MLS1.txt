@@ -1,0 +1,64 @@
+configure terminal
+hostname MLS1
+line con 0
+loggin syn
+exit
+
+vlan 10
+vlan 20
+vlan 30
+vlan 40
+vlan 802
+name NATIVE
+
+
+interface range e0/0,e0/1,e3/3
+duplex full
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk native vlan 802
+
+int range e0/0,e0/1
+channel-group 1 mode passive
+exit
+
+interface range po1,e3/3
+switchport trunk allowed vlan 10,20,30,40,802
+switchport trunk native vlan 802
+exit
+
+interface range e3/0, e3/1
+switchport mode acc
+exi
+
+int e3/0
+switchport acc vlan 10
+int e3/1
+switchport acc vlan 20
+exi
+
+spanning-tree vlan 10 priority 12288
+spanning-tree vlan 20 priority 12288
+spanning-tree vlan 30 priority 16384
+spanning-tree vlan 40 priority 16384
+
+
+int vlan 10
+ip address 10.0.10.5 255.255.255.0
+ip helper-address 10.0.40.10
+no sh
+
+int vlan 20
+ip address 10.0.20.5 255.255.255.0
+ip helper-address 10.0.40.10
+no sh
+
+int vlan 30
+ip address 10.0.30.5 255.255.255.0
+no sh
+
+int vlan 40
+ip address 10.0.40.5 255.255.255.0
+no sh
+
+

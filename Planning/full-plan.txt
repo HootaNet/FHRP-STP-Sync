@@ -1,0 +1,193 @@
+IOS Images:	
+	SW1: 			GNS3 Switch
+	SW2: 			GNS3 Switch
+	SW3: 			GNS3 Switch
+	SW4: 			GNS3 Switch
+	MLS1:			IOU L2 image			 (I86BI_LINUXL2-ADVIPSERVICESK9-M), Version 15.2
+	MLS2: 			IOU L2 image			 (I86BI_LINUXL2-ADVIPSERVICESK9-M), Version 15.2
+	MLS3: 			vIOS image				 (vios_l2-ADVENTERPRISEK9-M), Version 15.2
+	MLS4: 			vIOS image				 (vios_l2-ADVENTERPRISEK9-M), Version 15.2
+	DNS-Server: 	IOU image (Router)		 (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(2)T	
+	DHCP-Server: 	IOU image (Router) 		 (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.5(2)T
+-------------------------------------------
+NOTE!:
+HSRP can't work on IOU MultiLayer Switches
+-------------------------------------------
+4 VLANS:
+	- VLAN 10: SW1; End hosts: PC1, PC2
+	- VLAN 20: SW2; End hosts: PC3, PC4
+	- VLAN 30: SW3; End hosts: PC5, PC6
+	- VLAN 40: SW4; Servers: DNS-Server, DHCP-Server
+	-VLAN 802: Native Vlan
+------------------------------
+Spanning-tree:
+	- MLS1:
+		VLAN 10: priority 12288
+		VLAN 20: priority 12288
+		VLAN 30: priority 16384
+		VLAN 40: priority 16384
+
+	- MLS2:
+		VLAN 10: priority 16384
+		VLAN 20: priority 16384
+		VLAN 30: priority 12288
+		VLAN 40: priority 12288
+
+	- MLS3:
+		VLAN 10: priority 4096 
+		VLAN 20: priority 4096
+		VLAN 30: priority 8192
+		VLAN 40: priority 8192
+
+	- MLS4: 
+		VLAN 10: priority 8192
+		VLAN 20: priority 8192
+		VLAN 30: priority 4096
+		VLAN 40: priority 4096
+------------------------------------
+
+IP Addresses Mappings:
+	VLAN 10		10.0.10.0/24 	gateway: 10.0.10.1
+	VLAN 20 	10.0.20.0/24	gateway: 10.0.20.1
+	VLAN 30 	10.0.30.0/24 	gateway: 10.0.30.1
+	VLAN 40 	10.0.40.0/24 	gateway: 10.0.40.1
+	----------------------------------------------
+	R1 - MLS3: 	192.168.1.0/30
+				R1: 192.168.1.1 	MLS3: 192.168.1.2
+
+	R1 - MLS4: 	192.168.3.0/30
+				R1: 192.168.1.1 	MLS4: 192.168.3.2
+
+	R2 - MLS4: 	192.168.2.0/30
+				R2: 192.168.2.1 	MLS4: 192.168.2.2
+
+	R2 - MLS3: 	192.168.4.0/30
+				R2: 192.168.4.1 	MLS3: 192.168.4.2
+----------------------------------------------------------
+
+Switch Virtual Interfaces (SVIs):
+	MLS3:
+		VLAN 10: 10.0.10.3
+		VLAN 20: 10.0.20.3
+		VLAN 30: 10.0.30.3
+		VLAN 40: 10.0.40.3
+
+	MLS4:
+		VLAN 10: 10.0.10.4
+		VLAN 20: 10.0.20.4
+		VLAN 30: 10.0.30.4
+		VLAN 40: 10.0.40.4
+
+	MLS1: 
+		VLAN 10: 10.0.10.5
+		VLAN 20: 10.0.20.5
+		VLAN 30: 10.0.30.5 
+		VLAN 40: 10.0.40.5
+
+	MLS2:
+		VLAN 10: 10.0.10.6
+		VLAN 20: 10.0.20.6
+		VLAN 30: 10.0.30.6
+		VLAN 40: 10.0.40.6
+-----------------------------------------
+NOTE!: 
+Configuring SVIs for the two MultiLayer 
+Switches before configuring HSRP, might result in a loop; due to 
+detecting duplicate addresses from both MultiLayer Switches.
+------------------------------------------
+
+HSRPv2:
+	MLS3:
+		group 10: VIP 10.0.10.1 	priority 105
+		group 20: VIP 10.0.20.1 	priority 105
+		group 30: VIP 10.0.30.1 	priority 95
+		group 40: VIP 10.0.40.1 	priority 95
+
+	MLS4:
+		group 10: VIP 10.0.10.1 	priority 95
+		group 20: VIP 10.0.20.1 	priority 95
+		group 30: VIP 10.0.30.1 	priority 105
+		group 40: VIP 10.0.40.1 	priority 105
+---------------------------------------------------
+
+OSPF:
+	MLS3:
+		Point-to-Point peering:	G2/0, G2/1
+
+	MLS4: 
+		Point-to-Point peering: G2/0, G2/1
+
+	R1:
+		Point-to-Point peering: G0/0, G1/0
+
+	R2: 
+		Point-to-Point peering: G0/0, G1/0
+---------------------------------------------------
+
+DNS:
+	name-server 8.8.8.8
+	MLS1: 		10.0.10.5
+				10.0.20.5
+				10.0.30.5
+				10.0.40.5
+
+	MLS2: 		10.0.10.6
+				10.0.20.6
+				10.0.30.6
+				10.0.40.6
+
+	MLS3: 		10.0.10.3
+				10.0.20.3
+				10.0.30.3
+				10.0.40.3
+				192.168.1.2
+				192.168.4.2
+
+	MLS4: 		10.0.10.4
+				10.0.20.4
+				10.0.30.4
+				10.0.40.4
+				192.168.2.2
+				192.168.3.2
+
+	R1: 		1.1.1.1
+				192.168.1.1
+				192.168.3.1
+
+	R2: 		2.2.2.2
+				192.168.2.1
+				192.168.4.1
+
+	DNS-SERVER: 	10.0.40.20
+
+	DHCP-SERVER:	10.0.40.10
+---------------------------------------
+
+DHCP:
+	Pool VLAN10:
+		net:	10.0.10.0/24	.10 - .250
+		def:	10.0.10.1
+		dns:	10.0.40.10
+
+	Pool VLAN20:
+		net:	10.0.20.0/24 	.10 - .250
+		def: 	10.0.20.1
+		dns: 	10.0.40.10
+
+	Pool VLAN30:
+		net: 	10.0.30.0/24 	.10 - .250
+		def: 	10.0.30.1
+		dns: 	10.0.40.10
+net = (Network), def = (Default-Router)
+dns = (DNS-Server) 
+
+Don't forget DHCP Relay agent configuration on MLS3 and MLS 4
+-----------------------------------------------
+
+Configuration for SW1, SW2, SW3, SW4:
+The default Configuration of all Switches
+should be that all the interfaces are access
+
+The clients will send traffic untagged through GNS3 Switches,
+and then the Multilayer Switches will tag them to their 
+configured vlan on the access ports.

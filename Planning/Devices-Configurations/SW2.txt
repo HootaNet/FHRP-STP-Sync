@@ -1,0 +1,1 @@
+! Configure all the interfaces as access ports !

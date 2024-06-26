@@ -1,0 +1,25 @@
+configure terminal
+line con 0
+loggin syn
+exit
+
+int g0/0
+no shutdown
+ip address 192.168.1.1 255.255.255.252
+ip ospf network point-to-point
+ip ospf 1 area 0
+int g1/0
+no shutdown
+ip address 192.168.3.1 255.255.255.252
+ip ospf network point-to-point
+ip ospf 1 area 0
+exi
+
+interface l0
+ip address 1.1.1.1 255.255.255.255
+no shutdown
+exit
+
+router ospf 1
+network 1.1.1.1 0.0.0.0 area 0
+default-information originate

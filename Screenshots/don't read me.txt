@@ -1,0 +1,7 @@
+3 - PC1 can ping all hosts in different vlans
+4 - Standby and IP for MLS3
+5 - Standby and IP for MLS4
+6 - MLS3 root for VLAN 10 and 20
+7 - MLS4 root for VLAN 30 and 40 
+8 - R1 OSPF details
+9 - R2 OSPF details

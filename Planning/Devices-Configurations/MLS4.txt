@@ -1,0 +1,108 @@
+configure terminal
+hostname MLS4
+line con 0
+loggin syn
+exit
+
+ip routing
+
+vlan 10
+vlan 20
+vlan 30
+vlan 40
+vlan 802
+
+interface range g0/0-1,g1/0-2,g3/3
+duplex full
+switchport trunk encapsulation dot1q
+switchport mode trunk 
+switchport trunk native vlan 802
+exit
+
+interface range g0/0-1
+channel-group 1 mode active
+exit
+
+interface range g1/0-2
+channel-group 2 mode active
+exi
+
+interface range po1,po2,g3/3
+switchport trunk allowed vlan 10,20,30,40,802
+switchport trunk native vlan 802
+exi
+
+spanning-tree mode rap
+spanning-tree vlan 10 priority 8192
+spanning-tree vlan 20 priority 8192
+spanning-tree vlan 30 priority 4096
+spanning-tree vlan 40 priority 4096
+
+interface vlan 10 
+no shutdown
+ip address 10.0.10.4 255.255.255.0
+interface vlan 20
+no shutdown
+ip address 10.0.20.4 255.255.255.0
+interface vlan 30
+no shutdown
+ip address 10.0.30.4 255.255.255.0
+interface vlan 40
+no shutdown
+ip address 10.0.40.4 255.255.255.0
+exi
+
+int g2/0
+no switchport 
+ip address 192.168.2.2 255.255.255.252
+ip ospf network point-to-point
+ip ospf 1 area 0
+int g2/1
+no switchport
+ip address 192.168.3.2 255.255.255.252
+ip ospf network point-to-point
+ip ospf 1 area 0
+exi
+
+router ospf 1
+passive-interface default
+no passive-interface g2/0
+no passive-interface g2/1
+network 10.0.10.0 0.0.0.255 area 0
+network 10.0.20.0 0.0.0.255 area 0
+network 10.0.30.0 0.0.0.255 area 0
+network 10.0.40.0 0.0.0.255 area 0
+exit
+
+int vlan 10
+standby version 2
+standby 10 ip 10.0.10.1
+standby 10 preempt
+standby 10 priority 95
+ip helper-address 10.0.40.20
+exi
+
+int vlan 20
+standby version 2
+standby 20 ip 10.0.20.1
+standby 20 preempt
+standby 20 priority 95
+ip helper-address 10.0.40.20
+exi
+
+int vlan 30
+standby version 2
+standby 30 ip 10.0.30.1
+standby 30 preempt
+standby 30 priority 105
+ip helper-address 10.0.40.20
+exi
+
+int vlan 40
+standby version 2
+standby 40 ip 10.0.40.1
+standby 40 preempt
+standby 40 priority 105
+ip helper-address 10.0.40.20
+exit
+
