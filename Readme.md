@@ -5,7 +5,7 @@ In this Project I created a network on GNS3, and it features FHRP & STP synchron
 HSRP is short for (Hot Standby Routing Protocol) and it is a **First Hop Redundancy Protocol** which is used to set multiple gateways for a subnet, one will act as a master or active and the other is in standby mode; waiting for the active Router (gateway) to fail, and if it fails it will become active.
 STP (Spanning-Tree Protocol) is the protocol used to prevent loops and make linking rules for the switches on the network, it is essential for a network that has many switches connected, but still it need attention to configuration detail.
 ## Topology
-![Topology](topology.png)
+![Topology](./topology.png)
 As you can see this is the topology of the network.
 ## Features:
 * 4 VLANs, 10, 20, 30, 40.
